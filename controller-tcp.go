@@ -28,6 +28,10 @@ func (c *HAProxyController) HAProxyTCPInitialize() {
 		PanicErr(errParser)
 	}
 
-	config.Delete(parser.Defaults, parser.DefaultSectionName, "option httplog")
-	config.Set(parser.Defaults, parser.DefaultSectionName, "option tcplog", types.SimpleOption{})
+	err := config.Delete(parser.Defaults, parser.DefaultSectionName, "option httplog")
+	PanicErr(err)
+	err = config.Set(parser.Defaults, parser.DefaultSectionName, "option tcplog", types.SimpleOption{
+		Comment: "Added on func HAProxyController->HAProxyInitialize",
+	})
+	PanicErr(err)
 }
