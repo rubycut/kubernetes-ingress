@@ -130,12 +130,18 @@ func (c *HAProxyController) HAProxyInitialize() {
 		Runtime:       &runtimeClient,
 	}
 
+	c.cfg.Init(c.osArgs, c.NativeAPI, c.osArgs.RunningMode)
+
 	err = c.apiStartTransaction()
-	LogErr(err)
+	PanicErr(err)
 	defer c.apiDisposeTransaction()
 	c.initHTTPS()
+
+	if c.cfg.RunningMode == ModeTCP {
+		c.HAProxyTCPInitialize()
+	}
 	err = c.apiCommitTransaction()
-	LogErr(err)
+	PanicErr(err)
 }
 
 func (c *HAProxyController) ActiveConfiguration() (*parser.Parser, error) {
@@ -283,7 +289,6 @@ func (c *HAProxyController) handleService(namespace *Namespace, ingress *Ingress
 	c.handleRateLimitingAnnotations(ingress, service, path)
 
 	if path.ServicePortInt == 0 {
-
 		backendName = fmt.Sprintf("%s-%s-%s", namespace.Name, service.Name, path.ServicePortString)
 	} else {
 		backendName = fmt.Sprintf("%s-%s-%d", namespace.Name, service.Name, path.ServicePortInt)
@@ -324,7 +329,7 @@ func (c *HAProxyController) handleService(namespace *Namespace, ingress *Ingress
 		if _, err = c.backendGet(backendName); err != nil {
 			backend := models.Backend{
 				Name: backendName,
-				Mode: "http",
+				Mode: string(c.cfg.RunningMode),
 			}
 			if err = c.backendCreate(backend); err != nil {
 				msg := err.Error()
