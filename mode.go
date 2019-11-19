@@ -2,18 +2,18 @@ package main
 
 import "fmt"
 
-type RunningMode string
+type Mode string
 
 const (
-	ModeHTTP RunningMode = "http"
-	ModeTCP  RunningMode = "tcp"
+	ModeHTTP Mode = "http"
+	ModeTCP  Mode = "tcp"
 )
 
 //UnmarshalFlag Unmarshal flag
-func (n *RunningMode) UnmarshalFlag(value string) error {
+func (n *Mode) UnmarshalFlag(value string) error {
 	switch value {
 	case string(ModeHTTP), string(ModeTCP):
-		*n = RunningMode(value)
+		*n = Mode(value)
 	default:
 		return fmt.Errorf("mode can be only '%s' or '%s'", ModeHTTP, ModeTCP)
 	}
@@ -21,6 +21,6 @@ func (n *RunningMode) UnmarshalFlag(value string) error {
 }
 
 //MarshalFlag Marshals flag
-func (n RunningMode) MarshalFlag() (string, error) {
+func (n Mode) MarshalFlag() (string, error) {
 	return string(n), nil
 }

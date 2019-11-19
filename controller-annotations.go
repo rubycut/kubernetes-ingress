@@ -106,7 +106,7 @@ func (c *HAProxyController) handleBackendAnnotations(ingress *Ingress, service *
 				}
 				needReload = true
 			case "annForwardedFor":
-				if c.cfg.RunningMode != ModeHTTP {
+				if c.cfg.Mode != ModeHTTP {
 					log.Printf("'option forwardfor' ignored for backend '%s' as it requires HTTP mode.\n", backend.Name)
 					continue
 				}

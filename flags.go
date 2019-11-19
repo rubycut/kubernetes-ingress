@@ -35,7 +35,7 @@ type OSArgs struct {
 	DefaultCertificate    NamespaceValue `long:"default-ssl-certificate" default:"" description:"secret name of the certificate"`
 	ConfigMap             NamespaceValue `long:"configmap" description:"configmap designated for HAProxy" default:"default/haproxy-configmap"`
 	KubeConfig            string         `long:"kubeconfig" default:"" description:"combined with -e. location of kube config file"`
-	RunningMode           RunningMode    `long:"mode" default:"http" description:"you can select mode tcp or http"`
+	Mode                  Mode           `long:"mode" default:"http" description:"you can select mode tcp or http"`
 	NamespaceWhitelist    []string       `long:"namespace-whitelist" description:"whitelisted namespaces"`
 	NamespaceBlacklist    []string       `long:"namespace-blacklist" description:"blacklisted namespaces"`
 	OutOfCluster          bool           `short:"e" description:"use as out of cluster controller NOTE: experimantal"`

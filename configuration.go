@@ -40,7 +40,7 @@ type Configuration struct {
 	NativeAPI             *clientnative.HAProxyClient
 	SSLRedirect           string
 	RateLimitingEnabled   bool
-	RunningMode           RunningMode
+	Mode                  Mode
 	HTTPRequests          map[string][]models.HTTPRequestRule
 	HTTPRequestsStatus    Status
 	TCPRequests           map[string][]models.TCPRequestRule
@@ -62,7 +62,7 @@ func (c *Configuration) IsRelevantNamespace(namespace string) bool {
 }
 
 //Init itialize configuration
-func (c *Configuration) Init(osArgs OSArgs, api *clientnative.HAProxyClient, runningMode RunningMode) {
+func (c *Configuration) Init(osArgs OSArgs, api *clientnative.HAProxyClient, runningMode Mode) {
 
 	c.NamespacesAccess = NamespacesWatch{
 		Whitelist: map[string]struct{}{},
@@ -93,7 +93,7 @@ func (c *Configuration) Init(osArgs OSArgs, api *clientnative.HAProxyClient, run
 	c.UseBackendRules = map[string]BackendSwitchingRule{}
 	c.UseBackendRulesStatus = EMPTY
 
-	c.RunningMode = runningMode
+	c.Mode = runningMode
 }
 
 //GetNamespace returns Namespace. Creates one if not existing

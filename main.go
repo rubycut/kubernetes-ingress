@@ -84,7 +84,7 @@ func main() {
 	log.Printf("Build date: %s\n\n", BuildTime)
 	log.Printf("ConfigMap: %s/%s\n", osArgs.ConfigMap.Namespace, osArgs.ConfigMap.Name)
 	log.Printf("Ingress class: %s\n", osArgs.IngressClass)
-	log.Printf("Running mode: %s\n", osArgs.RunningMode)
+	log.Printf("Mode: %s\n", osArgs.Mode)
 
 	//TODO currently using default log, switch to something more convenient
 	log.SetFlags(LogType)

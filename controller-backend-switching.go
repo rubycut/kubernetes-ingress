@@ -54,7 +54,7 @@ func (c *HAProxyController) useBackendRuleRefresh() (needsReload bool) {
 			rule := c.cfg.UseBackendRules[name]
 			id := int64(0)
 			var condTest string
-			if c.cfg.RunningMode == ModeHTTP {
+			if c.cfg.Mode == ModeHTTP {
 				if rule.Host != "" {
 					condTest = fmt.Sprintf("{ req.hdr(host) -i %s } ", rule.Host)
 				}
@@ -65,7 +65,7 @@ func (c *HAProxyController) useBackendRuleRefresh() (needsReload bool) {
 					log.Println(fmt.Sprintf("Both Host and Path are empty for frontend %s with backend %s, SKIP", frontend, rule.Backend))
 					continue
 				}
-			} else /* c.cfg.RunningMode == ModeTCP */ {
+			} else /* c.cfg.Mode == ModeTCP */ {
 				if rule.Host != "" {
 					condTest = fmt.Sprintf("{ req_ssl_sni -i %s } ", rule.Host)
 				} else {
