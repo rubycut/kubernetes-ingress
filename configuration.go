@@ -37,6 +37,7 @@ type Configuration struct {
 	Namespace             map[string]*Namespace
 	NamespacesAccess      NamespacesWatch
 	ConfigMap             *ConfigMap
+	ConfigMapTCPServices  *ConfigMap
 	NativeAPI             *clientnative.HAProxyClient
 	SSLRedirect           string
 	RateLimitingEnabled   bool
@@ -206,6 +207,13 @@ func (c *Configuration) Clean() {
 		c.ConfigMap = nil
 	default:
 		c.ConfigMap.Status = EMPTY
+	}
+	c.ConfigMapTCPServices.Annotations.Clean()
+	switch c.ConfigMapTCPServices.Status {
+	case DELETED:
+		c.ConfigMapTCPServices = nil
+	default:
+		c.ConfigMapTCPServices.Status = EMPTY
 	}
 	c.HTTPRequestsStatus = EMPTY
 	c.TCPRequestsStatus = EMPTY

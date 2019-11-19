@@ -73,6 +73,10 @@ func (c *HAProxyController) useBackendRuleRefresh() (needsReload bool) {
 				}
 
 			}
+			if c.cfg.Mode == ModeTCP && frontend != FrontendHTTPS {
+				//only https is enabled, http will falback to default section
+				continue
+			}
 			backends[rule.Backend] = struct{}{}
 			err = c.backendSwitchingRuleCreate(frontend, models.BackendSwitchingRule{
 				Cond:     "if",
