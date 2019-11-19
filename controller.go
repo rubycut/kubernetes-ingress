@@ -138,7 +138,7 @@ func (c *HAProxyController) HAProxyInitialize() {
 	c.initHTTPS()
 
 	if c.cfg.Mode == ModeTCP {
-		c.HAProxyTCPInitialize()
+		c.HAProxyInitializeTCP()
 	}
 	err = c.apiCommitTransaction()
 	PanicErr(err)

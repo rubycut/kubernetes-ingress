@@ -6,7 +6,7 @@ import (
 	"github.com/haproxytech/config-parser/v2/types"
 )
 
-func (c *HAProxyController) HAProxyTCPInitialize() {
+func (c *HAProxyController) HAProxyInitializeTCP() {
 	config, errParser := c.ActiveConfiguration()
 	PanicErr(errParser)
 
