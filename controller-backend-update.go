@@ -16,8 +16,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/haproxytech/models"
 	"strings"
+
+	"github.com/haproxytech/models"
 )
 
 type backend models.Backend
@@ -43,12 +44,16 @@ func (b *backend) updateCheckTimeout(data *StringW) error {
 	return nil
 }
 
-func (b *backend) updateForwardfor(data *StringW) error {
+func (b *backend) updateForwardfor(data *StringW, sslPassthrough *StringW) error {
 	val := &models.Forwardfor{
 		Enabled: &data.Value,
 	}
 	if err := val.Validate(nil); err != nil {
 		return fmt.Errorf("forwarded-for option: %s", err)
+	}
+	if sslPassthrough.Value == ENABLED {
+		b.Forwardfor = nil
+		return fmt.Errorf("'option forwardfor' ignored for backend '%s' as it requires HTTP mode.\n", b.Name)
 	}
 	b.Forwardfor = val
 	return nil
@@ -80,5 +85,15 @@ func (b *backend) updateHttpchk(data *StringW) error {
 		return fmt.Errorf("httpchk option: %s", err)
 	}
 	b.Httpchk = val
+	return nil
+}
+
+func (b *backend) updateSSLPassthrough(data *StringW, forwardFor *StringW) error {
+	mode := ModeHTTP
+	if data.Value == ENABLED && data.Status != DELETED {
+		mode = ModeTCP
+	}
+	b.Mode = string(mode)
+	b.updateForwardfor(forwardFor, data)
 	return nil
 }

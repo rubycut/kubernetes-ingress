@@ -130,12 +130,15 @@ func (c *HAProxyController) HAProxyInitialize() {
 		Runtime:       &runtimeClient,
 	}
 
+	c.cfg.Init(c.osArgs, c.NativeAPI, c.osArgs.Mode)
+
 	err = c.apiStartTransaction()
-	LogErr(err)
+	PanicErr(err)
 	defer c.apiDisposeTransaction()
 	c.initHTTPS()
+
 	err = c.apiCommitTransaction()
-	LogErr(err)
+	PanicErr(err)
 }
 
 func (c *HAProxyController) ActiveConfiguration() (*parser.Parser, error) {
@@ -283,7 +286,6 @@ func (c *HAProxyController) handleService(namespace *Namespace, ingress *Ingress
 	c.handleRateLimitingAnnotations(ingress, service, path)
 
 	if path.ServicePortInt == 0 {
-
 		backendName = fmt.Sprintf("%s-%s-%s", namespace.Name, service.Name, path.ServicePortString)
 	} else {
 		backendName = fmt.Sprintf("%s-%s-%d", namespace.Name, service.Name, path.ServicePortInt)
@@ -322,9 +324,14 @@ func (c *HAProxyController) handleService(namespace *Namespace, ingress *Ingress
 	switch status {
 	case ADDED, MODIFIED:
 		if _, err = c.backendGet(backendName); err != nil {
+			modeTCP, _ := GetValueFromAnnotations("ssl-passthrough") // ADD c.cfg.ConfigMap.Annotations
+			mode := "http"
+			if modeTCP.Status != DELETED && modeTCP.Value == ENABLED {
+				mode = "tcp"
+			}
 			backend := models.Backend{
 				Name: backendName,
-				Mode: "http",
+				Mode: mode,
 			}
 			if err = c.backendCreate(backend); err != nil {
 				msg := err.Error()

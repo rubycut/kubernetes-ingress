@@ -26,6 +26,12 @@ import (
 	extensions "k8s.io/api/extensions/v1beta1"
 )
 
+//ENABLED string to avoid possible typos in code
+const ENABLED = "enabled"
+
+//DISABLED string to avoid possible typos in code
+const DISABLED = "disabled"
+
 func homeDir() string {
 	if h := os.Getenv("HOME"); h != "" {
 		return h
@@ -43,6 +49,18 @@ func LogErr(err error) {
 		log.SetFlags(LogTypeShort)
 		log.Printf("%s:%d %s\n", file1, no, err.Error())
 		log.SetFlags(LogType)
+	}
+}
+
+func PanicErr(err error) {
+	if err == nil {
+		return
+	}
+	_, file, no, ok := runtime.Caller(1)
+	if ok {
+		file1 := strings.Replace(file, "/src/", "", 1)
+		log.SetFlags(LogTypeShort)
+		log.Panicf("%s:%d %s\n", file1, no, err.Error())
 	}
 }
 

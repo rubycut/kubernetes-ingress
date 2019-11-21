@@ -84,6 +84,7 @@ func (c *HAProxyController) handleBackendAnnotations(ingress *Ingress, service *
 	backendAnnotations["annCheckHttp"], _ = GetValueFromAnnotations("check-http", service.Annotations, ingress.Annotations, c.cfg.ConfigMap.Annotations)
 	backendAnnotations["annForwardedFor"], _ = GetValueFromAnnotations("forwarded-for", service.Annotations, ingress.Annotations, c.cfg.ConfigMap.Annotations)
 	backendAnnotations["annTimeoutCheck"], _ = GetValueFromAnnotations("timeout-check", service.Annotations, ingress.Annotations, c.cfg.ConfigMap.Annotations)
+	backendAnnotations["annSSLPassthrough"], _ = GetValueFromAnnotations("ssl-passthrough") // LATER ON ADD c.cfg.ConfigMap.Annotations in all places
 
 	for k, v := range backendAnnotations {
 		if v == nil {
@@ -106,7 +107,7 @@ func (c *HAProxyController) handleBackendAnnotations(ingress *Ingress, service *
 				}
 				needReload = true
 			case "annForwardedFor":
-				if err := backend.updateForwardfor(v); err != nil {
+				if err := backend.updateForwardfor(v, backendAnnotations["annSSLPassthrough"]); err != nil {
 					LogErr(err)
 					continue
 				}
@@ -115,6 +116,14 @@ func (c *HAProxyController) handleBackendAnnotations(ingress *Ingress, service *
 				if v.Status == DELETED && !newBackend {
 					backend.CheckTimeout = nil
 				} else if err := backend.updateCheckTimeout(v); err != nil {
+					LogErr(err)
+					continue
+				}
+				needReload = true
+			case "annSSLPassthrough":
+				if !newBackend {
+					backend.Mode = string(ModeHTTP)
+				} else if err := backend.updateSSLPassthrough(v, backendAnnotations["annForwardedFor"]); err != nil {
 					LogErr(err)
 					continue
 				}

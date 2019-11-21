@@ -61,7 +61,7 @@ func (c *Configuration) IsRelevantNamespace(namespace string) bool {
 }
 
 //Init itialize configuration
-func (c *Configuration) Init(osArgs OSArgs, api *clientnative.HAProxyClient) {
+func (c *Configuration) Init(osArgs OSArgs, api *clientnative.HAProxyClient, runningMode Mode) {
 
 	c.NamespacesAccess = NamespacesWatch{
 		Whitelist: map[string]struct{}{},
@@ -207,4 +207,5 @@ func (c *Configuration) Clean() {
 	c.HTTPRequestsStatus = EMPTY
 	c.TCPRequestsStatus = EMPTY
 	c.UseBackendRulesStatus = EMPTY
+	defaultAnnotationValues.Clean()
 }

@@ -128,6 +128,10 @@ func (c *HAProxyController) updateHAProxy() error {
 	LogErr(err)
 	needsReload = needsReload || reload
 
+	reload, err = c.handleSSLPassthrough()
+	LogErr(err)
+	needsReload = needsReload || reload
+
 	reload = c.useBackendRuleRefresh()
 	needsReload = needsReload || reload
 

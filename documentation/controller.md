@@ -15,6 +15,9 @@ you can run image with arguments:
 - `--ingress.class`
   - default: ""
   - class of ingress object to monitor in multiple controllers environment
+- `--mode`
+  - default `http`
+  - mode can be `http` or `tcp`
 - `--namespace-whitelist`
   - optional, if listed only selected namespaces will be monitored
   - :information_source: `namespace-whitelist` has priority over blacklisting.

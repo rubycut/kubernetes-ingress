@@ -422,33 +422,37 @@ func (c *HAProxyController) eventService(ns *Namespace, data *Service) (updateRe
 
 func (c *HAProxyController) eventConfigMap(ns *Namespace, data *ConfigMap, chConfigMapReceivedAndProcessed chan bool) (updateRequired bool) {
 	updateRequired = false
-	if ns.Name != c.osArgs.ConfigMap.Namespace ||
-		data.Name != c.osArgs.ConfigMap.Name {
-		return updateRequired
+	//TODO refractor this so we remember all configmaps, since we now use more that one
+	configmap := false
+
+	if ns.Name == c.osArgs.ConfigMap.Namespace && data.Name == c.osArgs.ConfigMap.Name {
+		configmap = true
 	}
-	switch data.Status {
-	case MODIFIED:
-		different := data.Annotations.SetStatus(c.cfg.ConfigMap.Annotations)
-		c.cfg.ConfigMap = data
-		if !different {
-			data.Status = EMPTY
-		} else {
-			updateRequired = true
-		}
-	case ADDED:
-		if c.cfg.ConfigMap == nil {
-			chConfigMapReceivedAndProcessed <- true
+	if configmap {
+		switch data.Status {
+		case MODIFIED:
+			different := data.Annotations.SetStatus(c.cfg.ConfigMap.Annotations)
 			c.cfg.ConfigMap = data
-			updateRequired = true
-			return updateRequired
+			if !different {
+				data.Status = EMPTY
+			} else {
+				updateRequired = true
+			}
+		case ADDED:
+			if c.cfg.ConfigMap == nil {
+				chConfigMapReceivedAndProcessed <- true
+				c.cfg.ConfigMap = data
+				updateRequired = true
+				return updateRequired
+			}
+			if !c.cfg.ConfigMap.Equal(data) {
+				data.Status = MODIFIED
+				return c.eventConfigMap(ns, data, chConfigMapReceivedAndProcessed)
+			}
+		case DELETED:
+			c.cfg.ConfigMap.Annotations.SetStatusState(DELETED)
+			c.cfg.ConfigMap.Status = DELETED
 		}
-		if !c.cfg.ConfigMap.Equal(data) {
-			data.Status = MODIFIED
-			return c.eventConfigMap(ns, data, chConfigMapReceivedAndProcessed)
-		}
-	case DELETED:
-		c.cfg.ConfigMap.Annotations.SetStatusState(DELETED)
-		c.cfg.ConfigMap.Status = DELETED
 	}
 	return updateRequired
 }
