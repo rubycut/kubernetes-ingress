@@ -26,6 +26,12 @@ import (
 	extensions "k8s.io/api/extensions/v1beta1"
 )
 
+//ENABLED string to avoid possible typos in code
+const ENABLED = "enabled"
+
+//DISABLED string to avoid possible typos in code
+const DISABLED = "disabled"
+
 func homeDir() string {
 	if h := os.Getenv("HOME"); h != "" {
 		return h

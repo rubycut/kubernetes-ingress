@@ -423,7 +423,6 @@ func (c *HAProxyController) eventService(ns *Namespace, data *Service) (updateRe
 func (c *HAProxyController) eventConfigMap(ns *Namespace, data *ConfigMap, chConfigMapReceivedAndProcessed chan bool) (updateRequired bool) {
 	updateRequired = false
 	//TODO refractor this so we remember all configmaps, since we now use more that one
-	log.Println("eventConfigMap", ns.Name, data.Name)
 	configmap := false
 	configmapTCP := false
 

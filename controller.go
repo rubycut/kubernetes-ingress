@@ -137,9 +137,6 @@ func (c *HAProxyController) HAProxyInitialize() {
 	defer c.apiDisposeTransaction()
 	c.initHTTPS()
 
-	if c.cfg.Mode == ModeTCP {
-		c.HAProxyInitializeTCP()
-	}
 	err = c.apiCommitTransaction()
 	PanicErr(err)
 }
@@ -327,9 +324,14 @@ func (c *HAProxyController) handleService(namespace *Namespace, ingress *Ingress
 	switch status {
 	case ADDED, MODIFIED:
 		if _, err = c.backendGet(backendName); err != nil {
+			modeTCP, _ := GetValueFromAnnotations("ssl-passthrough") // ADD c.cfg.ConfigMap.Annotations
+			mode := "http"
+			if modeTCP.Status != DELETED && modeTCP.Value == ENABLED {
+				mode = "tcp"
+			}
 			backend := models.Backend{
 				Name: backendName,
-				Mode: string(c.cfg.Mode),
+				Mode: mode,
 			}
 			if err = c.backendCreate(backend); err != nil {
 				msg := err.Error()

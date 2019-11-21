@@ -85,8 +85,16 @@ func main() {
 	log.Printf("ConfigMap: %s/%s\n", osArgs.ConfigMap.Namespace, osArgs.ConfigMap.Name)
 	log.Printf("Ingress class: %s\n", osArgs.IngressClass)
 	log.Printf("Mode: %s\n", osArgs.Mode)
+
 	if osArgs.ConfigMapTCPServices.Name != "" {
 		log.Printf("TCP Services defined in %s/%s\n", osArgs.ConfigMapTCPServices.Namespace, osArgs.ConfigMapTCPServices.Name)
+	}
+
+	if osArgs.Mode == ModeTCP {
+		defaultAnnotationValues["ssl-passthrough"] = &StringW{
+			Value:  ENABLED,
+			Status: ADDED,
+		}
 	}
 
 	//TODO currently using default log, switch to something more convenient
